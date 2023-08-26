@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "get_team_urls": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7092",
+      "launchBrowser": false
+    }
+  }
+}
