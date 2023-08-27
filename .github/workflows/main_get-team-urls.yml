@@ -39,4 +39,4 @@ jobs:
           app-name: 'get-team-urls'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_29D04062A5194A77B16054CF9022D322 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_GET_TEAM_URLS }}
