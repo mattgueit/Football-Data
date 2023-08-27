@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "get_team_urls": {
+    "get_football_data": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7092",
+      "commandLineArgs": "--port 7143",
       "launchBrowser": false
     }
   }
