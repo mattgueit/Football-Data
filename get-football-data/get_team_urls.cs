@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace get_football_data
 {
+    [StorageAccount("AzureWebJobsStorage")]
     public class get_team_urls
     {
         [FunctionName("get_team_urls")]
