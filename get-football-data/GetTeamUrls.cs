@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace get_football_data
 {
     [StorageAccount("AzureWebJobsStorage")]
-    public class get_team_urls
+    public class GetTeamUrls
     {
         [FunctionName("get_team_urls")]
         [return: Queue("team-urls")]
