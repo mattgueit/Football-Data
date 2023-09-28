@@ -17,8 +17,8 @@ namespace get_football_data
         const string teamsTableXPath = "//*[@id=\"yw1\"]/table/tbody";
         const string teamRowsXPath = "//*[@class=\"hauptlink no-border-links\"]";
 
-        [FunctionName("get_team_urls")]
-        [return: Queue(nameof(GetTeamUrls))]
+        [FunctionName(nameof(GetTeamUrls))]
+        [return: Queue("team-urls")]
         public string[] Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation("Fetching team urls.");
