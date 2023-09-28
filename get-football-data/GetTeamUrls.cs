@@ -18,7 +18,7 @@ namespace get_football_data
         const string teamRowsXPath = "//*[@class=\"hauptlink no-border-links\"]";
 
         [FunctionName("get_team_urls")]
-        [return: Queue("team-urls")]
+        [return: Queue(nameof(GetTeamUrls))]
         public string[] Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             log.LogInformation("Fetching team urls.");
