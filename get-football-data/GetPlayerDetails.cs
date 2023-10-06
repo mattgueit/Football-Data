@@ -10,9 +10,9 @@ namespace get_football_data
     public class GetPlayerDetails
     {
         [FunctionName("get_player_details")]
-        public void Run([QueueTrigger("team-urls")] TeamUrl teamUrl, ILogger log)
+        public void Run([QueueTrigger("team-urls")] string teamUrl, ILogger log)
         {
-            log.LogInformation($"C# Queue trigger function processed: {teamUrl.TeamName}: {teamUrl.Url}");
+            log.LogInformation($"C# Queue trigger function processed: {teamUrl}");
         }
     }
 }
