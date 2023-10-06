@@ -9,7 +9,7 @@ namespace get_football_data
     [StorageAccount("AzureWebJobsStorage")]
     public class GetPlayerDetails
     {
-        [FunctionName("get-player-details")]
+        [FunctionName("get_player_details")]
         public void Run([QueueTrigger("team-urls")] TeamUrl teamUrl, ILogger log)
         {
             log.LogInformation($"C# Queue trigger function processed: {teamUrl.TeamName}: {teamUrl.Url}");
