@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using get_football_data.ErrorHandling;
@@ -21,6 +22,11 @@ namespace get_football_data
         [return: Queue("player-data")]
         public string[] Run([QueueTrigger("team-urls")] string teamUrlString, ILogger log)
         {
+            var serializerOptions = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
             var teamUrl = JsonSerializer.Deserialize<TeamUrl>(teamUrlString);
 
             log.LogInformation($"Fetching player data for {teamUrl.TeamName}");
@@ -37,44 +43,17 @@ namespace get_football_data
 
             foreach (var playerRow in playerRows)
             {
-                var playerColumns = playerRow.ChildNodes
-                    .Where(x => x.Name == "td")
-                    .ToList();
-
-                ValidatePlayerColumns(playerColumns);
-
-                var playerDetails = new PlayerDetails()
+                PlayerDetails playerDetails = null;
+                try
                 {
-                    TeamName = "Arsenal" // MG TODO: replace with actual team name. This can be grabbed from the message in the queue.
-                };
+                    playerDetails = ScrapePlayerDetails(playerRow, teamUrl);
 
-                for (int i = 0; i < playerColumns.Count; i++)
-                {
-                    var playerColumn = playerColumns[i];
-
-                    switch (i)
-                    {
-                        case 0:
-                            GetColumn0PlayerData(playerDetails, playerColumn);
-                            break;
-                        case 1:
-                            GetColumn1PlayerData(playerDetails, playerColumn);
-                            break;
-                        case 2:
-                            GetColumn2PlayerData(playerDetails, playerColumn);
-                            break;
-                        case 3:
-                            GetColumn3PlayerData(playerDetails, playerColumn);
-                            break;
-                        case 4:
-                            GetColumn4PlayerData(playerDetails, playerColumn);
-                            break;
-                        default:
-                            throw new Exception($"Unexpected player details column [{i}].");
-                    }
+                    playerData.Add(JsonSerializer.Serialize(playerDetails, serializerOptions));
                 }
-
-                playerData.Add(JsonSerializer.Serialize(playerDetails));
+                catch (Exception ex)
+                {
+                    log.LogError($"Failed to scrape player details. {ex.Message}", ex);
+                }
             }
 
             return playerData.ToArray();
@@ -91,6 +70,48 @@ namespace get_football_data
             return doc;
         }
 
+        private static PlayerDetails ScrapePlayerDetails(HtmlNode playerRow, TeamUrl teamUrl)
+        {
+            var playerColumns = playerRow.ChildNodes
+                .Where(x => x.Name == "td")
+                .ToList();
+
+            ValidatePlayerColumns(playerColumns);
+
+            var playerDetails = new PlayerDetails()
+            {
+                TeamName = teamUrl.TeamName
+            };
+
+            for (int i = 0; i < playerColumns.Count; i++)
+            {
+                var playerColumn = playerColumns[i];
+
+                switch (i)
+                {
+                    case 0:
+                        GetColumn0PlayerData(playerDetails, playerColumn);
+                        break;
+                    case 1:
+                        GetColumn1PlayerData(playerDetails, playerColumn);
+                        break;
+                    case 2:
+                        GetColumn2PlayerData(playerDetails, playerColumn);
+                        break;
+                    case 3:
+                        GetColumn3PlayerData(playerDetails, playerColumn);
+                        break;
+                    case 4:
+                        GetColumn4PlayerData(playerDetails, playerColumn);
+                        break;
+                    default:
+                        throw new Exception($"Unexpected player details column [{i}].");
+                }
+            };
+
+            return playerDetails;
+        }
+
         private static void GetColumn0PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
         {
             Throw.IfNull(playerColumn, "player column 0");
@@ -103,7 +124,7 @@ namespace get_football_data
 
             if (!int.TryParse(shirtNumberDiv.InnerText, out var shirtNumber))
             {
-                throw new Exception($"Shirt number is not a valid integer: \"{shirtNumberDiv}\"");
+                throw new Exception($"Shirt number is not a valid integer: {shirtNumberDiv.InnerText}");
             }
 
             playerDetails.Position = playerPosition.Value.ToUpper();
@@ -139,7 +160,7 @@ namespace get_football_data
 
             playerDetails.PlayerImageUrl = playerImageUrl;
             playerDetails.PlayerPageUrl = $"{baseUrl}{playerPagePath}";
-            playerDetails.PlayerName = playerName.Trim().Replace("\n", "");
+            playerDetails.PlayerName = playerName.Replace("\n", "").Replace("&nbsp;", "").Trim();
             playerDetails.Position = position.Trim().Replace("\n", "");
             playerDetails.Id = int.Parse(Path.GetFileName(playerPagePath));
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 using get_football_data.Models;
 using HtmlAgilityPack;
@@ -37,13 +38,13 @@ namespace get_football_data
                 {
                     var attributes = teamRow.FirstChild.Attributes;
 
-                    var title = attributes["title"].Value;
-                    var href = attributes["href"].Value;
+                    var teamName = attributes["title"].Value;
+                    var teamPath = attributes["href"].Value;
 
                     var teamUrl = new TeamUrl
                     {
-                        TeamName = title,
-                        Url = $"{baseUrl}{href}"
+                        TeamName = WebUtility.HtmlDecode(teamName),
+                        Url = $"{baseUrl}{teamPath}"
                     };
 
                     teamUrls.Add(JsonSerializer.Serialize(teamUrl));

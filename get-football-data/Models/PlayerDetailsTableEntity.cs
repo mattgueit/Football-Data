@@ -1,12 +1,14 @@
 ﻿using System;
+using Azure;
+using Azure.Data.Tables;
 
 namespace get_football_data.Models
 {
-    public class PlayerDetails
+    public class PlayerDetailsTableEntity : ITableEntity
     {
-        public int Id { get; set; }
+        public string PartitionKey { get; set; } // team name
+        public string RowKey { get; set; } // player id
         public string PlayerName { get; set; }
-        public string TeamName { get; set; }
         public int ShirtNumber { get; set; }
         public string Position { get; set; }
         public DateTime DateOfBirth { get; set; }
@@ -16,5 +18,7 @@ namespace get_football_data.Models
         public double MaxMarketValue { get; set; }
         public string PlayerImageUrl { get; set; }
         public string PlayerPageUrl { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
+        public ETag ETag { get; set; }
     }
 }
