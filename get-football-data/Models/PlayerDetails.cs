@@ -13,7 +13,6 @@ namespace get_football_data.Models
         public string TeamName { get; set; }
         public int ShirtNumber { get; set; }
         public string Position { get; set; }
-        public string ExactPosition { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string Nationality { get; set; }
         public string NationalityFlagUrl { get; set; }

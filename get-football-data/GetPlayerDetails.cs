@@ -61,16 +61,13 @@ namespace get_football_data
                             GetColumn1PlayerData(playerDetails, playerColumn);
                             break;
                         case 2:
-                            // No data in this column.
+                            GetColumn2PlayerData(playerDetails, playerColumn);
                             break;
                         case 3:
                             GetColumn3PlayerData(playerDetails, playerColumn);
                             break;
                         case 4:
                             GetColumn4PlayerData(playerDetails, playerColumn);
-                            break;
-                        case 5:
-                            GetColumn5PlayerData(playerDetails, playerColumn);
                             break;
                         default:
                             throw new Exception($"Unexpected player details column [{i}].");
@@ -118,7 +115,7 @@ namespace get_football_data
             Throw.IfNull(playerColumn, "player column 1");
 
             var inLineTableRows = playerColumn
-                .SelectNodes("./table/tbody/tr")
+                .SelectNodes("./table/tr")
                 .ToList();
 
             Throw.IfNullOrEmpty(inLineTableRows, "in-line table containing player image");
@@ -136,25 +133,25 @@ namespace get_football_data
 
             var playerName = anchorTag.InnerText;
 
-            var exactPosition = inLineTableRows[1]
+            var position = inLineTableRows[1]
                 .SelectSingleNode("./td")
                 .InnerText;
 
             playerDetails.PlayerImageUrl = playerImageUrl;
             playerDetails.PlayerPageUrl = $"{baseUrl}{playerPagePath}";
-            playerDetails.PlayerName = playerName;
-            playerDetails.ExactPosition = exactPosition;
+            playerDetails.PlayerName = playerName.Trim().Replace("\n", "");
+            playerDetails.Position = position.Trim().Replace("\n", "");
             playerDetails.Id = int.Parse(Path.GetFileName(playerPagePath));
         }
 
-        private static void GetColumn3PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
+        private static void GetColumn2PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
         {
             Throw.IfNull(playerColumn, "player column 3");
 
             playerDetails.DateOfBirth = GetDateOfBirth(playerColumn.InnerText);
         }
 
-        private static void GetColumn4PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
+        private static void GetColumn3PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
         {
             Throw.IfNull(playerColumn, "player column 4");
 
@@ -177,7 +174,7 @@ namespace get_football_data
             playerDetails.NationalityFlagUrl = nationalityFlagUrl;
         }
 
-        private static void GetColumn5PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
+        private static void GetColumn4PlayerData(PlayerDetails playerDetails, HtmlNode? playerColumn)
         {
             Throw.IfNull(playerColumn, "player column 5");
 
@@ -276,8 +273,8 @@ namespace get_football_data
         {
             Throw.IfNullOrEmpty(playerColumns, "player columns");
 
-            if (playerColumns.Count != 6)
-                throw new Exception($"Expected 6 player columns. Instead found {playerColumns.Count}");
+            if (playerColumns.Count != 5)
+                throw new Exception($"Expected 5 player columns. Instead found {playerColumns.Count}");
 
             if (playerColumns.Any(x => x == null))
                 throw new Exception($"A null player column was found.");
